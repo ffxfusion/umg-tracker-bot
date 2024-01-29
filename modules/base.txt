@@ -1,0 +1,14 @@
+const discord = require("discord.js");
+
+module.exports.run = async(client, message, args, mentionFix, getUser) => {
+
+}
+
+module.exports.config = {
+    name: "",
+    category: "",
+    description: "",
+    aliases: [],
+    usages: [],
+    examples: []
+}
