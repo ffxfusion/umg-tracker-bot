@@ -6,46 +6,52 @@ client.on("ready", async () => {
     console.log("selfbot online.");
 });
 
+const webhookUrls = {
+    rarespawn: "proxy server webhook url here",
+    normalTracker: "proxy server webhook url here",
+    alteredTracker: "proxy server webhook url here",
+    superAlteredTracker: "proxy server webhook url here",
+    giganticTracker: "proxy server webhook url here",
+    tinyTracker: "proxy server webhook url here",
+    evilTracker: "proxy server webhook url here"
+};
+  
+const hooks = {};
+  
+for (const [key, url] of Object.entries(webhookUrls)) {
+    hooks[`${key}Hook`] = new WebhookClient({ url });
+}
+
 let embedData = {
-    ore: "",
-    varient: "", //no varient detection here yet
-    miner: "",
-    position: "",
-    pickaxe: "",
-    rawChance: "",
-    rng: "",
     rare: false
 };
 
-const hook = new WebhookClient({ url: "webhook url here (of proxy server)" })
-
 client.on("messageCreate", async (message) => {
-    if (message.guild.id === "1059506407826788393" && message.channel.id === "1059846328772993064" && message.author.id === "1088664915457347594") {
-        const data = message.embeds[0].description.split(" | ").map(item => item.split("**")[1]);
+    const guildId = "1059506407826788393";
+    const trackers = {
+        "1059846328772993064": { authorId: "1088664915457347594", hook: hooks.rarespawnHook, content: embedData.rare ? "ping" : " " },
+        "1059846357860491376": { authorId: "1088664394130534421", hook: hooks.normalTrackerHook },
+        "1173767047080054784": { authorId: "1173767219549843527", hook: hooks.alteredTrackerHook },
+        "1173773186240888842": { authorId: "1173773260542988483", hook: hooks.superAlteredTrackerHook },
+        "1173778041600757760": { authorId: "1173778285767950436", hook: hooks.giganticTrackerHook },
+        "1173778098379034705": { authorId: "1173779194933682197", hook: hooks.tinyTrackerHook },
+        "1173778128921960518": { authorId: "1173779668030206032", hook: hooks.evilTrackerHook }
+    };
 
-        [embedData.miner, embedData.position, embedData.pickaxe, embedData.rawChance] = data;
-        
-        embedData.ore = message.embeds[0].title;
-        embedData.rng = data[3].split("**")[3];
+    if (message.guild.id === guildId) {
+        const tracker = trackers[message.channel.id];
+        if (tracker && message.author.id === tracker.authorId) {
+            if (message.content && tracker === trackers["1059846328772993064"]) {
+                embedData.rare = true;
+            }
 
-        if (message.content) {
-            embedData.rare = true;
+            tracker.hook.send({ content: tracker.content || " ", embeds: [message.embeds[0]] });
         }
-
-        //sends to proxy server
-        hook.send({ content: embedData.rare ? "ping" : " ", embeds: [message.embeds[0]] });
     }
 
     embedData = {
-        ore: "",
-        varient: "",
-        miner: "",
-        position: "",
-        pickaxe: "",
-        rawChance: "",
-        rng: "",
         rare: false
     };
-})
+});
 
 client.login("token here");
