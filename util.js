@@ -97,6 +97,22 @@ const handleChannelDeleteAndLog = (config, channel, database, logMessage) => {
     return false;
 }
 
+
+const variantDetector = (embed) => {
+    const variants = ["Altered", "Super", "Altered", "Gigantic", "Tiny", "EVIL"];
+    const title = embed.title.split(" ");
+
+    if (title.length === 1) {
+        return "";
+    }
+
+    if (variants.includes(title[0]) && !title[1].includes(variants[0]) || variants.includes(title[1]) && title[1].includes(variants[2])){
+        return title[0] === variants[1] && title[1] === variants[2] ? `${title[0]} ${title[1]}` : title[0] === variants[1] ? "" : title[0];
+    } else {
+        return "";
+    }
+}
+
 module.exports = {
     getInfo,
     sendHook,
@@ -106,5 +122,6 @@ module.exports = {
     convertToNumber,
     sendGlobal,
     handleChannelDelete,
-    handleChannelDeleteAndLog
+    handleChannelDeleteAndLog,
+    variantDetector
 }
