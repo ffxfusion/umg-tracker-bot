@@ -1,9 +1,8 @@
 const data = require("../data");
 const util = require("../util.js");
 
-
 module.exports = async (client, message) => {
-if (message.guild.id === guildId && message.channel.id === "1199452992215191773" && message.author.id === "1199453047600984115") {
+if (message.guild.id === "proxy" && message.channel.id === "proxy" && message.author.id === "proxy") {
         data.embedData = util.formatData(message);
         data.embedData.variant = util.variantDetector(message.embeds[0]);
 
