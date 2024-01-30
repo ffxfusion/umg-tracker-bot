@@ -3,8 +3,9 @@ const util = require("../util.js");
 
 
 module.exports = async (client, message) => {
-    if (message.guild.id === "proxy guild id" && message.channel.id === "proxy channel id" && message.author.id === "proxy webhook id") {
+if (message.guild.id === guildId && message.channel.id === "1199452992215191773" && message.author.id === "1199453047600984115") {
         data.embedData = util.formatData(message);
+        data.embedData.variant = util.variantDetector(message.embeds[0]);
 
         if (message.content) {
             data.embedData.rare = true
@@ -19,7 +20,7 @@ module.exports = async (client, message) => {
             await util.sendGlobal(content);
         }
 
-        data.embedData = { ore: "", varient: "", miner: "", position: "", pickaxe: "", rawChance: "", rng: "", rare: false }
+        data.embedData = { ore: "", variant: "", miner: "", position: "", pickaxe: "", rawChance: "", rng: "", rare: false }
     }
 
     //copied from my old bot
