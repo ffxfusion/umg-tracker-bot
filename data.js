@@ -5,7 +5,7 @@ module.exports = {
     alias: new discord.Collection(),
     embedData: {
         ore: "",
-        varient: "",
+        variant: "",
         miner: "",
         position: "",
         pickaxe: "",
