@@ -2,15 +2,25 @@ const server = require("../schema/guild.js");
 const { ChannelType } = require("discord.js");
 
 module.exports.run = async (client, message, args, mentionFix, getUser) => {
-    const category = await message.guild.channels.cache.find(c => c.type === ChannelType.GuildCategory && c.name === "syaro tracker");
     const database = await server.findOne({ guildId: message.guild.id }).catch(err => console.log(err));
-
-    if (!category) {
-        return message.channel.send("Tracker has not been setup, use the 'setup' command.");
-    }
 
     if (args && args.find(v => v.includes("@everyone") || v.includes("@here"))) {
         return message.channel.send("Nice try asshole.");
+    }
+    
+    let categories = message.guild.channels.cache.filter(c => c.type === ChannelType.GuildCategory && c.name.startsWith("syaro tracker")).sort((a, b) => b.position - a.position);
+    let category = categories.first();
+    
+    if (!category) {
+        return message.channel.send("Tracker has not been setup, use the 'setup' command.");
+    }
+    
+    while (category && category.children.cache.size >= 50) {
+        let newCategoryName = `syaro tracker ${message.guild.channels.cache.filter(c => c.type === ChannelType.GuildCategory && c.name.startsWith("syaro tracker")).size + 1}`;
+        category = await message.guild.channels.create({
+            name: newCategoryName,
+            type: ChannelType.GuildCategory
+        });
     }
 
     if (args[0].toLowerCase() === "add") {
