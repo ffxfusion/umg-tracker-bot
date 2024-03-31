@@ -6,22 +6,34 @@ const getInfo = async () => {
     return data;
 }
 
-const sendHook = (id, token, content) => {
+const sendHook = async (id, token, content) => {
     const hook = new WebhookClient({ id: id, token: token });
 
-    hook.send(content).catch(console.error);
+    try {
+        await hook.send(content);
+    } catch (err) {
+        console.log(`[ERROR] Webhook probally deleted somehow, deleting from database.`);
+
+        await server.findOneAndUpdate({ "config.userspawn.webhookID": id }, {
+                $pull: {
+                    "config.userspawn": {
+                        webhookID: id
+                    }
+                }
+            },
+            { 
+                new: true,
+                multi: true
+            }
+        )
+    }
 }
 
 const sendRarespawn = async (msg) => {
     const data = await getInfo();
     for (const id of data) {
         if (isNaN(id.config.rarespawn.webhookID)) continue;
-
-        try {
-            sendHook(id.config.rarespawn.webhookID, id.config.rarespawn.webhookToken, msg)
-        } catch (err) {
-            console.log(`[ERROR] ${id.guildName} (${id.guildId}) | ${err}`);
-        }
+        sendHook(id.config.rarespawn.webhookID, id.config.rarespawn.webhookToken, msg)
     }
 }
 
@@ -30,11 +42,7 @@ const sendUserspawn = async (msg, miner) => {
     for (const id of data) {
         for (const user of id.config.userspawn) {
             if (user.username !== miner || isNaN(user.webhookID)) continue;
-            try {
-                sendHook(user.webhookID, user.webhookToken, msg);
-            } catch (err) {
-                console.log(`[ERROR] ${id.guildName} (${id.guildId}) | ${err}`);
-            }
+            sendHook(user.webhookID, user.webhookToken, msg);
         }
     }
 }
@@ -99,15 +107,15 @@ const handleChannelDeleteAndLog = (config, channel, database, logMessage) => {
 
 
 const variantDetector = (embed) => {
-    const variants = ["Altered", "Super", "Altered", "Gigantic", "Tiny", "EVIL"];
+    const variants = ["Altered", "Super", "Gigantic", "Tiny", "EVIL"];
     const title = embed.title.split(" ");
 
     if (title.length === 1) {
         return "";
     }
 
-    if (variants.includes(title[0]) && !title[1].includes(variants[0]) || variants.includes(title[1]) && title[1].includes(variants[2])){
-        return title[0] === variants[1] && title[1] === variants[2] ? `${title[0]} ${title[1]}` : title[0] === variants[1] ? "" : title[0];
+    if (variants.includes(title[0]) && !title[1].includes(variants[0]) || variants.includes(title[1]) && title[1].includes(variants[0])){
+        return title[0] === variants[1] && title[1] === variants[0] ? `${title[0]} ${title[1]}` : title[0] === variants[1] ? "" : title[0];
     } else {
         return "";
     }
