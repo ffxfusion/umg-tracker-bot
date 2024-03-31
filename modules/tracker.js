@@ -9,6 +9,10 @@ module.exports.run = async (client, message, args, mentionFix, getUser) => {
         return message.channel.send("Tracker has not been setup, use the 'setup' command.");
     }
 
+    if (args && args.find(v => v.includes("@everyone") || v.includes("@here"))) {
+        return message.channel.send("Nice try asshole.");
+    }
+
     if (args[0].toLowerCase() === "add") {
         if (!args[1]) {
             return message.channel.send("Please provide a username to track.");
