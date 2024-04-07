@@ -1,26 +1,13 @@
 const server = require("../schema/guild.js");
 const { ChannelType } = require("discord.js");
+const util = require("../util.js");
+
 
 module.exports.run = async (client, message, args, mentionFix, getUser) => {
-    const database = await server.findOne({ guildId: message.guild.id }).catch(err => console.log(err));
+    const database = await server.findOne({ guildId: message.guild.id }).catch(err => util.logger(err));
 
     if (args && args.find(v => v.includes("@everyone") || v.includes("@here"))) {
         return message.channel.send("Nice try asshole.");
-    }
-    
-    let categories = message.guild.channels.cache.filter(c => c.type === ChannelType.GuildCategory && c.name.startsWith("syaro tracker")).sort((a, b) => b.position - a.position);
-    let category = categories.first();
-    
-    if (!category) {
-        return message.channel.send("Tracker has not been setup, use the 'setup' command.");
-    }
-    
-    while (category && category.children.cache.size >= 50) {
-        let newCategoryName = `syaro tracker ${message.guild.channels.cache.filter(c => c.type === ChannelType.GuildCategory && c.name.startsWith("syaro tracker")).size + 1}`;
-        category = await message.guild.channels.create({
-            name: newCategoryName,
-            type: ChannelType.GuildCategory
-        });
     }
 
     if (args[0].toLowerCase() === "add") {
@@ -33,6 +20,8 @@ module.exports.run = async (client, message, args, mentionFix, getUser) => {
         if (channel) {
             return message.channel.send("This user is already being tracked.");
         }
+
+        const category = await util.handleChannelCreation(message, ChannelType.GuildCategory);
     
         if (!channel) {
             channel = await message.guild.channels.create({
@@ -59,10 +48,10 @@ module.exports.run = async (client, message, args, mentionFix, getUser) => {
                     username: args[1].toLowerCase(),
                 }
             }
-        }).catch(err => console.log(err));
+        }).catch(err => util.logger(err));
     
         message.channel.send(`Now tracking "${args[1]}".`);
-        console.log(`[TRACKER] ${message.guild.name} (${message.guild.id}) is now tracking ${args[1]}.`);
+        util.logger(`[TRACKER] ${message.guild.name} (${message.guild.id}) is now tracking ${args[1]}.`);
     } else if (args[0].toLowerCase() === "remove") {
         if (!args[1]) {
             return message.channel.send("Please provide a username to track.");
@@ -93,7 +82,7 @@ module.exports.run = async (client, message, args, mentionFix, getUser) => {
                         username: args[1].toLowerCase()
                     }
                 }
-            }).catch(err => console.log(err));
+            }).catch(err => util.logger(err));
         }
 
         try {
@@ -102,7 +91,7 @@ module.exports.run = async (client, message, args, mentionFix, getUser) => {
             return;
         }
 
-        console.log(`[TRACKER] ${message.guild.name} (${message.guild.id}) is no longer tracking ${args[1]}.`);
+        util.logger(`[TRACKER] ${message.guild.name} (${message.guild.id}) is no longer tracking ${args[1]}.`);
 
     } else {
         message.channel.send("Invalid type, please use 'add' or 'remove' then the username.");
