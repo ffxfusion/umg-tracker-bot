@@ -12,7 +12,7 @@ const sendHook = async (id, token, content) => {
     try {
         await hook.send(content);
     } catch (err) {
-        console.log(`[ERROR] Webhook probally deleted somehow, deleting from database.`);
+        logger(`[ERROR] Webhook probally deleted somehow, deleting from database.`);
 
         await server.findOneAndUpdate({ "config.userspawn.webhookID": id }, {
                 $pull: {
@@ -82,7 +82,7 @@ const sendGlobal = async (msg) => {
         try {
             sendHook(id.config.globaltracker.webhookID, id.config.globaltracker.webhookToken, msg);
         } catch (err) {
-            console.log(`[ERROR] ${id.guildName} (${id.guildId}) | ${err}`);
+            logger(`[ERROR] ${id.guildName} (${id.guildId}) | ${err}`);
         }
     }
 }
@@ -93,13 +93,13 @@ const handleChannelDelete = (config, db) => {
         webhookID: "null",
         webhookToken: "null"
     });
-    return db.save().catch(err => console.log(err));
+    return db.save().catch(err => logger(err));
 }
 
 const handleChannelDeleteAndLog = (config, channel, database, logMessage) => {
     if (config.channelID === channel.id) {
         handleChannelDelete(config, database);
-        console.log(logMessage);
+        logger(logMessage);
         return true;
     }
     return false;
@@ -121,6 +121,43 @@ const variantDetector = (embed) => {
     }
 }
 
+const sendRareFind = async (msg) => {
+    const data = await getInfo();
+    for (const id of data) {
+        if (isNaN(id.config.raretracker.webhookID)) continue;
+
+        try {
+            sendHook(id.config.raretracker.webhookID, id.config.raretracker.webhookToken, msg);
+        } catch (err) {
+            logger(`[ERROR] ${id.guildName} (${id.guildId}) | ${err}`);
+        }
+    }
+}
+
+const handleChannelCreation = async (message, type) => {
+    let categories = message.guild.channels.cache.filter(c => c.type === type && c.name.startsWith("syaro tracker")).sort((a, b) => b.position - a.position);
+    let category = categories.first();
+    
+    if (!category) {
+        return message.channel.send("Tracker has not been setup, use the 'setup' command.");
+    }
+    
+    while (category && category.children.cache.size >= 50) {
+        let newCategoryName = `syaro tracker ${message.guild.channels.cache.filter(c => c.type === type && c.name.startsWith("syaro tracker")).size + 1}`;
+        category = await message.guild.channels.create({
+            name: newCategoryName,
+            type: type
+        });
+    }
+
+    return category;
+}
+
+const logger = async (m) => {
+    console.log(m);
+    await sendHook("webhook id", "webhook token", `\`${m}\``);
+}
+
 module.exports = {
     getInfo,
     sendHook,
@@ -131,5 +168,8 @@ module.exports = {
     sendGlobal,
     handleChannelDelete,
     handleChannelDeleteAndLog,
-    variantDetector
+    variantDetector,
+    sendRareFind,
+    handleChannelCreation,
+    logger
 }
