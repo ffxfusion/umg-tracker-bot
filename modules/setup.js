@@ -1,9 +1,10 @@
 const server = require("../schema/guild.js");
 const { ChannelType } = require("discord.js");
+const util = require("../util.js");
 
 module.exports.run = async (client, message, args, mentionFix, getUser) => {
     let category = await message.guild.channels.cache.find(c => c.type === ChannelType.GuildCategory && c.name === "syaro tracker");
-    let channel = await server.findOne({ guildId: message.guild.id }).catch(err => console.log(err));
+    let channel = await server.findOne({ guildId: message.guild.id }).catch(err => util.logger(err));
 
     if (!category) {
         category = await message.guild.channels.create({
@@ -40,10 +41,10 @@ module.exports.run = async (client, message, args, mentionFix, getUser) => {
                 channelID: channel.id, 
             }
         }
-    }).catch(err => console.log(err));
+    }).catch(err => util.logger(err));
 
     message.channel.send("Tracker has been setup. It will log rare spawns in the channel, for username tracker, run the 'track' command.");
-    console.log(`[SETUP] ${message.guild.name} (${message.guild.id}) has been setup.`);
+    util.logger(`[SETUP] ${message.guild.name} (${message.guild.id}) has been setup.`);
 }
 
 module.exports.config = {
