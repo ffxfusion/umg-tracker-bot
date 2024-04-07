@@ -1,17 +1,15 @@
 const server = require("../schema/guild.js");
 const { ChannelType } = require("discord.js");
+const util = require("../util.js");
 
-module.exports.run = async(client, message, args, mentionFix, getUser) => {
-    const category = await message.guild.channels.cache.find(c => c.type === ChannelType.GuildCategory && c.name === "syaro tracker");
-    let channel = await server.findOne({ guildId: message.guild.id }).catch(err => console.log(err));
-
-    if (!category) {
-        return message.channel.send("Tracker has not been setup, use the 'setup' command.");
-    }
+module.exports.run = async (client, message, args, mentionFix, getUser) => {
+    let channel = await server.findOne({ guildId: message.guild.id }).catch(err => util.logger(err));
 
     if (!isNaN(channel.config.globaltracker.channelID)) {
         return message.channel.send("Global tracker has already been setup.");
     }
+
+    const category = await util.handleChannelCreation(message, ChannelType.GuildCategory);
 
     if (isNaN(channel.config.globaltracker.channelID)) {
         channel = await message.guild.channels.create({
@@ -37,11 +35,11 @@ module.exports.run = async(client, message, args, mentionFix, getUser) => {
                 channelID: channel.id, 
             }
         }
-    }).catch(err => console.log(err));
+    }).catch(err => util.logger(err));
 
     message.channel.send("Global tracker has been setup. This tracker will log all rare spawns that are 100M+.");
 
-    console.log(`[SETUP] ${message.guild.name} (${message.guild.id}) global tracker has been setup.`);
+    util.logger(`[SETUP] ${message.guild.name} (${message.guild.id}) global tracker has been setup.`);
 }
 
 module.exports.config = {
