@@ -1,3 +1,5 @@
+const util = require('../util.js');
+
 module.exports = (client) => {
-    console.log(`[READY] ${client.user.tag} is online.`);
+    util.logger(`[READY] ${client.user.tag} is online.`);
 }
