@@ -2,11 +2,11 @@ const data = require("../data");
 const util = require("../util.js");
 const voidTracker = require("../voidTracker.js");
 
-const guildId = "1199452920958161016";
+const guildId = "proxy server";
 
 module.exports = async (client, message) => {
     // rare spawn tracker, global tracker, user tracker, etc
-    if (message.guild.id === guildId && message.channel.id === "1199452992215191773" && message.author.id === "1199453047600984115") {
+    if (message.guild.id === guildId && message.channel.id === "proxy server" && message.author.id === "proxy server") {
         data.embedData = util.formatData(message);
         data.embedData.variant = util.variantDetector(message.embeds[0]);
 
