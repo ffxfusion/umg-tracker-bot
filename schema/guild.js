@@ -16,6 +16,16 @@ const guildSchema = new Schema({
             webhookToken: String,
             webhookID: String,
         },
+        raretracker: {
+            channelID: String,
+            webhookToken: String,
+            webhookID: String,
+        },
+        voidtracker: { // wip feature
+            channelID: String,
+            webhookToken: String,
+            webhookID: String,
+        },
         userspawn: []
     }
 });
