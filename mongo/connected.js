@@ -1,3 +1,5 @@
+const utils = require("../util.js");
+
 module.exports = () => {
-    console.log(`[DATABASE] MongoDB has been connected.`);
+    utils.logger("[DATABASE] MongoDB has been connected.");
 }
