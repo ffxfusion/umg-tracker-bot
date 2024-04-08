@@ -29,7 +29,7 @@ let embedData = {
 client.on("messageCreate", async (message) => {
     const guildId = "1059506407826788393";
     const trackers = {
-        "1059846328772993064": { authorId: "1088664915457347594", hook: hooks.rarespawnHook, content: embedData.rare ? "ping" : " " },
+        "1059846328772993064": { authorId: "1088664915457347594", hook: hooks.rarespawnHook },
         "1059846357860491376": { authorId: "1088664394130534421", hook: hooks.normalTrackerHook },
         "1173767047080054784": { authorId: "1173767219549843527", hook: hooks.alteredTrackerHook },
         "1173773186240888842": { authorId: "1173773260542988483", hook: hooks.superAlteredTrackerHook },
@@ -45,7 +45,7 @@ client.on("messageCreate", async (message) => {
                 embedData.rare = true;
             }
 
-            tracker.hook.send({ content: tracker.content || " ", embeds: [message.embeds[0]] });
+            tracker.hook.send({ content: embedData.rare ? "ping" : " ", embeds: [message.embeds[0]] });
         }
     }
 
