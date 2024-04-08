@@ -58,7 +58,7 @@ const formatData = (message) => {
         pickaxe: data[2][1],
         rawChance: data[3][1],
         rng: data[3][3],
-        rare: false
+        rare: message.content ? true : false
     }
 }
 
