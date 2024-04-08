@@ -7,12 +7,9 @@ const guildId = "proxy server";
 module.exports = async (client, message) => {
     // rare spawn tracker, global tracker, user tracker, etc
     if (message.guild.id === guildId && message.channel.id === "proxy server" && message.author.id === "proxy server") {
+                
         data.embedData = util.formatData(message);
         data.embedData.variant = util.variantDetector(message.embeds[0]);
-
-        if (message.content) {
-            data.embedData.rare = true
-        }
 
         const content = { embeds: [message.embeds[0]]};
         //await util.sendRarespawn({ content: data.embedData.rare ? "@everyone" : " ", embeds: [message.embeds[0]]});
